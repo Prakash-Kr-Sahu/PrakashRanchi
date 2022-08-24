@@ -1,0 +1,31 @@
+{
+	"name": "Adobe_Analytics_Metadata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SOURCE_ADOBE",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Source_Folder_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@{concat('/sftp.uat.liaison.eu/inbox/adobe_cdh_uat/',dataset().Source_Folder_name)}",
+					"type": "Expression"
+				},
+				"fileSystem": "liason"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

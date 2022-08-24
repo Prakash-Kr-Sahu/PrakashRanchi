@@ -1,0 +1,38 @@
+{
+	"name": "LSGen2PrepCDHAdobe",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ACQN",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Destination_Folder_name": {
+				"type": "string"
+			},
+			"File_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().File_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@{concat('LANDING/Staging/Adobe_Analytics/INBOUND/DE/',dataset().Destination_Folder_name)}",
+					"type": "Expression"
+				},
+				"fileSystem": "cdh"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

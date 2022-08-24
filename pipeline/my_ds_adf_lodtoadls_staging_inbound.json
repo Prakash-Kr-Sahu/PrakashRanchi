@@ -1,0 +1,148 @@
+{
+	"name": "my_ds_adf_lodtoadls_staging_inbound",
+	"properties": {
+		"activities": [
+			{
+				"name": "Source To Run",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@{replace(replace(pipeline().parameters.Source,'''',''),'''','')}",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "Adobe_Analytics"
+						},
+						{
+							"value": "SMG_VOC",
+							"activities": [
+								{
+									"name": "No SFTP for SMG VOC",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "Select 'DO Nothing Move on'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_sql_rdpcrm_azure_db",
+											"type": "DatasetReference"
+										},
+										"firstRowOnly": true
+									}
+								}
+							]
+						},
+						{
+							"value": "CRM_Hub",
+							"activities": [
+								{
+									"name": "Create CRM Delta",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Shared/Dummy2",
+										"baseParameters": {
+											"Source": "'MyTest'"
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_DBR",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "List of LOD File Names",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Source To Run",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT Source,\nCountryId ,\nCountryCode,\nObjectName,\nLandingFileName \nFROM config.IngestionConfig\nWHERE Source = @{pipeline().parameters.Source}\nand CountryCode = @{pipeline().parameters.Country_Id}\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_rdpcrm_azure_db",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"Country_Id": {
+				"type": "string",
+				"defaultValue": "'DE'"
+			},
+			"Source": {
+				"type": "string",
+				"defaultValue": "'Adobe_Analytics'"
+			},
+			"Subscription_Id": {
+				"type": "string"
+			},
+			"Resource_Group": {
+				"type": "string"
+			},
+			"Factory_Name": {
+				"type": "string",
+				"defaultValue": "az400-asa"
+			},
+			"Delete_From_SFTP": {
+				"type": "string",
+				"defaultValue": "N"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-08-22T14:57:38Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

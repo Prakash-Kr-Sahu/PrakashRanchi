@@ -1,0 +1,11 @@
+{
+	"name": "LS_KV",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://az400-kv.vault.azure.net/"
+		}
+	}
+}
