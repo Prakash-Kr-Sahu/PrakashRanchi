@@ -1,5 +1,5 @@
 {
-	"name": "my_ds_adf_lodtoadls_staging_inbound",
+	"name": "My Test for CICD",
 	"properties": {
 		"activities": [
 			{
